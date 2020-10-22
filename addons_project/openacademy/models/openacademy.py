@@ -33,6 +33,7 @@ class OpenacademySession(models.Model):
                                 required=True,
                                 ondelete="cascade")
     attendee_ids = fields.Many2many('openacademy.partner')
+    active = fields.Boolean('Active', default=True)
 
 
 class OpenacademyPartner(models.Model):
