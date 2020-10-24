@@ -1,6 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <record id="action_menu_courses" model="ir.actions.act_window">
+        <field name="name">Courses</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">openacademy.course</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class='o_view_nocontent_smiling_face'>
+                Create first course
+            </p>
+        </field>
+    </record>
 
-    </data>
+    <record id="action_menu_sessions" model="ir.actions.act_window">
+        <field name="name">Sessions</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">openacademy.session</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Top menu item -->
+    <menuitem name="Open Academy"
+              id="open_academy_root"
+              web_icon="openacademy,static/description/icon.png"
+              sequence="0"/>
+
+    <menuitem id="open_academy_menu" name="Open Academy" parent="open_academy_root"/>
+    <menuitem id="menu_courses" name="Courses" parent="open_academy_menu" action="action_menu_courses"/>
+    <menuitem id="menu_sessions" name="Sessions" parent="open_academy_menu" action="action_menu_sessions"/>
+
+
+    <record id="openacademy_course_tree" model="ir.ui.view">
+        <field name="name">openacademy.course.tree</field>
+        <field name="model">openacademy.course</field>
+        <field name="arch" type="xml">
+            <tree string="Course Tree">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="responsible_id"/>
+                <field name="session_ids"/>
+                <field name="level"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="openacademy_session_tree" model="ir.ui.view">
+        <field name="name">openacademy.session.tree</field>
+        <field name="model">openacademy.session</field>
+        <field name="arch" type="xml">
+            <tree string="Session Tree">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="duration"/>
+                <field name="instruction_id"/>
+                <field name="course_id"/>
+                <field name="attendee_ids"/>
+                <field name="active"/>
+                <field name="seats"/>
+                <field name="taken_seats" widget="progressbar"/>
+
+
+            </tree>
+        </field>
+    </record>
+
 </odoo>
