@@ -1,6 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
 
-    </data>
+    <record id="action_menu_books" model="ir.actions.act_window">
+        <field name="name">Books</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">library.book</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class='o_view_nocontent_smiling_face'>
+                Create first book
+            </p>
+        </field>
+    </record>
+
+    <record id="action_menu_partners" model="ir.actions.act_window">
+        <field name="name">Partners</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">library.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_menu_rentals" model="ir.actions.act_window">
+        <field name="name">Rentals</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">library.rental</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_menu_publishers" model="ir.actions.act_window">
+        <field name="name">Publisher</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">library.publisher</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Library"
+              id="library_root"
+              web_icon="library,static/description/icon.png"
+              sequence="0"/>
+
+    <menuitem id="library_menu_books" name="Book" parent="library_root"/>
+    <menuitem id="menu_books" name="Books" parent="library_menu_books" action="action_menu_books"/>
+    <menuitem id="library_menu_partners" name="Partners" parent="library_root"/>
+    <menuitem id="menu_partners" name="Partners" parent="library_menu_partners" action="action_menu_partners"/>
+    <menuitem id="library_menu_rentals" name="Rentals" parent="library_root"/>
+    <menuitem id="menu_rentals" name="Rentals" parent="library_menu_rentals" action="action_menu_rentals"/>
+    <menuitem id="library_menu_publishers" name="Publishers" parent="library_root"/>
+    <menuitem id="menu_publishers" name="Publishers" parent="library_menu_publishers" action="action_menu_publishers"/>
+
+    <record id="library_books_tree" model="ir.ui.view">
+        <field name="name">library.books.tree</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <tree string="Library Books Tree">
+                <field name="name"/>
+                <field name="author_ids" widget="many2many_tags" domain="[('partner_type','=','author')]"/>
+                <field name="edition_date"/>
+                <field name="isbn"/>
+                <field name="publisher_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="library_books_search_view" model="ir.ui.view">
+        <field name="name">library.books.search</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <search string="Search Books">
+                <field name="name" string="name" filter_domain="[('name','ilike',self)]"/>
+                <field name="isbn" string="ISBN" filter_domain="[('isbn','ilike',self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="library_books_form" model="ir.ui.view">
+        <field name="name">library.books.form</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <form string="Library Books Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="author_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   domain="[('partner_type','=','author')]"/>
+                            <field name="edition_date"/>
+                        </group>
+                        <group>
+                            <field name="isbn"/>
+                            <field name="publisher_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="library_partners_tree" model="ir.ui.view">
+        <field name="name">library.partners.tree</field>
+        <field name="model">library.partner</field>
+        <field name="arch" type="xml">
+            <tree string="Library Partners Tree">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="address"/>
+                <field name="partner_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="library_partners_search_view" model="ir.ui.view">
+        <field name="name">library.partners.search</field>
+        <field name="model">library.partner</field>
+        <field name="arch" type="xml">
+            <search string="Search Partners">
+                <filter name="partner_type" string="Customer" domain="[('partner_type','ilike', 'customer')]"/>
+                <filter name="partner_type" string="Author" domain="[('partner_type','ilike', 'author')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="library_partners_form" model="ir.ui.view">
+        <field name="name">library.partners.form</field>
+        <field name="model">library.partner</field>
+        <field name="arch" type="xml">
+            <form string="Library Partner Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="address"/>
+                        </group>
+                        <group>
+                            <field name="partner_type"/>
+                            <field name="rental_ids" widget="one2many"
+                                   attrs="{'invisible':[('partner_type', '=', 'author')]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="library_rentals_tree" model="ir.ui.view">
+        <field name="name">library.rentals.tree</field>
+        <field name="model">library.rental</field>
+        <field name="arch" type="xml">
+            <tree string="Library Rentals Tree"
+                  decoration-danger="('date.today()' &gt; planned_return_date and (not return_date))">
+                <field name="customer_id"/>
+                <field name="book_id"/>
+                <field name="rental_date"/>
+                <field name="return_date"/>
+                <field name="planned_return_date" invisible="1"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="library_rentals_form" model="ir.ui.view">
+        <field name="name">library.rentals.form</field>
+        <field name="model">library.rental</field>
+        <field name="arch" type="xml">
+            <form string="Library Rentals Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_id" domain="[('partner_type','=','customer')]"/>
+                            <field name="book_id" string="Book"/>
+                            <field name="book_authors"/>
+                        </group>
+                        <group>
+                            <field name="rental_date"/>
+                            <field name="planned_return_date"/>
+                            <field name="return_date"/>
+                            <field name="book_edition_date"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
 </odoo>
