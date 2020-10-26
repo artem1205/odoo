@@ -13,6 +13,16 @@ class LibraryBook(models.Model):
     isbn = fields.Char('ISBN', index=True)
     publisher_id = fields.Many2one('library.publisher', string='Publisher')
     rental_ids = fields.One2many('library.rental', 'book_id', string='rental #')
+    copy_ids = fields.One2many('library.copy', 'book_id', string='Copy #')
+
+
+class LibraryCopy(models.Model):
+    _name = "library.copy"
+    _inherits = {'library.book': 'book_id'}
+
+    book_id = fields.Many2one('library.book', delegate=True, required=True, ondelete="cascade")
+    reference = fields.Char(string='Reference', required=True)
+    rental_ids = fields.One2many('library.rental', 'book_id', string='rental #')
 
 
 class LibraryRental(models.Model):
@@ -20,7 +30,7 @@ class LibraryRental(models.Model):
 
     customer_id = fields.Many2one('library.partner', string='Customer',
                                   store=True, required=True)
-    book_id = fields.Many2one('library.book', 'rental_ids', store=True)
+    book_id = fields.Many2one('library.book', related='copy_id.book_id', readonly=True)
     rental_date = fields.Date(string='Rental Date', store=True, required=True)
     return_date = fields.Date(string='Return Date', store=True)
     planned_return_date = fields.Date(string='Planned Return Date', store=True, required=True)
@@ -29,7 +39,8 @@ class LibraryRental(models.Model):
     book_authors = fields.Char('Book authors', related='book_id.author_ids.name')
     book_edition_date = fields.Date('Edition Date', related='book_id.edition_date')
     book_publisher = fields.Char('Publisher', related='book_id.name')
-
+    copy_id = fields.Many2one('library.copy', string='Copy #')
+    reference = fields.Char('Reference', related='copy_id.reference')
 
 class LibraryPartner(models.Model):
     _name = "library.partner"
