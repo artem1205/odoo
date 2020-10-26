@@ -10,7 +10,7 @@ class OpenacademyCourse(models.Model):
 
     name = fields.Char(reqired=True)
     description = fields.Text()
-    responsible_id = fields.Many2one('openacademy.partner')
+    responsible_id = fields.Many2one('res.partner')
     session_ids = fields.One2many('openacademy.session', 'course_id', string='Session')
     level = fields.Selection([('easy', 'Easy'),
                               ('medium', 'Medium'),
@@ -28,15 +28,14 @@ class OpenacademySession(models.Model):
     start_date = fields.Date(default=date.today())
     end_date = fields.Date(default=date.today())
     duration = fields.Float(default=1)
-    instruction_id = fields.Many2one('openacademy.partner')
+    instruction_id = fields.Many2one('res.partner')
     course_id = fields.Many2one('openacademy.course',
                                 required=True,
                                 ondelete="cascade")
-    attendee_ids = fields.Many2many('openacademy.partner')
+    attendee_ids = fields.Many2many('res.partner')
     active = fields.Boolean('Active', default=True)
     seats = fields.Integer('# of seats')
     taken_seats = fields.Float('Taken seats', compute='_onchange_seats')
-
 
     @api.onchange('attendee_ids', 'seats')
     def _onchange_seats(self):
@@ -46,14 +45,21 @@ class OpenacademySession(models.Model):
             else:
                 self.taken_seats = 100*len(self.attendee_ids)/self.seats
         if self.taken_seats > 100:
-            raise ValidationError(_('No more seats available, available seats: %s, number of students: %s'))\
-              % (self.seats, self.attendee_ids)
+            raise ValidationError('No more seats available, available seats: %s, number of students: %s' %
+                                  (self.seats, len(self.attendee_ids)))
 
 
-class OpenacademyPartner(models.Model):
-    _name = "openacademy.partner"
+# class OpenacademyPartner(models.Model):
+#    _name = "openacademy.partner"
+#
+#    name = fields.Char('Name')
+#    instructor = fields.Boolean('Instructor')
+#    session_id = fields.Many2many('openacademy.session',
+#                                  readonly=True)
 
-    name = fields.Char('Name')
-    instructor = fields.Boolean('Instructor')
-    session_id = fields.Many2many('openacademy.session',
-                                  readonly=True)
+
+class OpenResPartner(models.Model):
+    _inherit = "res.partner"
+
+    instructor = fields.Boolean("Instructor", default=False)
+    sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions")
