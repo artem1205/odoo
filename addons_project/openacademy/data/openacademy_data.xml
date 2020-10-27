@@ -138,6 +138,22 @@
             <field name="vat" position="after">
                 <field name="instructor"/>
             </field>
+            <notebook position="inside">
+                <page string="Sessions">
+                    <field name="sessions_ids"/>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="inherited_view_partner_tree" model="ir.ui.view">
+        <field name="name">inherited_res.partner.tree</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="email" position="before">
+                <field name="instructor"/>
+            </field>
         </field>
     </record>
 
