@@ -19,12 +19,13 @@ class OpenacademyCourse(models.Model):
 
 class OpenacademySession(models.Model):
     _name = "openacademy.session"
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
 
     name = fields.Char(reqired=True)
     state = fields.Selection([('draft', 'Draft'),
                               ('confirmed', 'Confirmed'),
                               ('done', 'Done')],
-                             default='draft')
+                             default='draft', index=True)
     start_date = fields.Date(default=date.today())
     end_date = fields.Date(default=date.today())
     duration = fields.Float(default=1)
@@ -37,16 +38,57 @@ class OpenacademySession(models.Model):
     seats = fields.Integer('# of seats')
     taken_seats = fields.Float('Taken seats', compute='_onchange_seats')
 
-    @api.onchange('attendee_ids', 'seats')
+    @api.depends('attendee_ids', 'seats')
     def _onchange_seats(self):
         for i in self:
             if not i.seats:
                 i.taken_seats = 0.0
             else:
-                self.taken_seats = 100*len(self.attendee_ids)/self.seats
+                i.taken_seats = 100.0 * len(i.attendee_ids)/i.seats
+
+    @api.onchange('attendee_ids', 'seats', 'taken_seats')
+    def _verify_seats(self):
         if self.taken_seats > 100:
             raise ValidationError('No more seats available, available seats: %s, number of students: %s' %
                                   (self.seats, len(self.attendee_ids)))
+
+    def print_message_session(self):
+        body = "Session: %s <br> Course: %s <br> State: %s" % (self.name, self.course_id.name, self.state)
+        self.message_post(body=body)
+
+    @api.multi
+    def action_draft(self):
+        self.write({'state': 'draft'})
+        self.print_message_session()
+
+    @api.multi
+    def action_confirm(self):
+        self.write({'state': 'confirmed'})
+        self.print_message_session()
+
+    @api.multi
+    def action_mark_done(self):
+        self.write({'state': 'done'})
+        self.print_message_session()
+
+    @api.onchange('taken_seats', 'state')
+    def _autochange(self):
+        for record in self:
+            if record.taken_seats >= 50 and record.state == 'draft':
+                record.state = 'confirmed'
+
+    @api.model
+    def create(self, vals):
+        result = super(OpenacademySession, self).create(vals)
+        result.message_subscribe([result.instruction_id.id])
+        return result
+
+    @api.multi
+    def write(self, vals):
+        result = super(OpenacademySession, self).write(vals)
+        for i in self:
+            i.message_subscribe([i.instruction_id.id])
+        return result
 
 
 # class OpenacademyPartner(models.Model):
