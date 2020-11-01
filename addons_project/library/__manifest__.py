@@ -21,12 +21,14 @@
     'version':     '0.1',
 
     # any module necessary for this one to work correctly
-    'depends':     ['base'],
+    'depends':     ['base', 'product', 'mail', 'portal'],
 
     # always loaded
     'data':        [
         "security/ir.model.access.csv",
         "data/library_data.xml",
+        "data/library.price.csv",
+        "data/cron_job_email.xml",
     ],
     # only loaded in demonstration mode
     'demo':        [],
