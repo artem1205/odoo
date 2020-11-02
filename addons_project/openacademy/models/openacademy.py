@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -15,6 +15,30 @@ class OpenacademyCourse(models.Model):
     level = fields.Selection([('easy', 'Easy'),
                               ('medium', 'Medium'),
                               ('hard', 'Hard')])
+    attendee_count = fields.Integer("# of Attendees", compute='_number_of_attendees_course', store=True)
+
+    @api.multi
+    @api.depends('session_ids')
+    def _number_of_attendees_course(self):
+        for session in self:
+            self.attendee_count += self.env['res.partner'].search_count(
+                [('sessions_ids.id', 'in', session.session_ids.ids)])
+         #   count = 0.0
+         #   for attend in session.session_ids:
+      #          count += self.env['res.partner'].search_count([('sessions_ids.id', '=', [attend.id])])
+        #self.attendee_count = count
+
+    @api.multi
+    def open_attendees(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'All Attendees',
+            'view_mode': 'tree',
+            'res_model': 'res.partner',
+            'domain': [('sessions_ids.id', 'in', self.session_ids.ids)],
+            'context': "{'create': False}"
+        }
 
 
 class OpenacademySession(models.Model):
@@ -33,18 +57,20 @@ class OpenacademySession(models.Model):
     course_id = fields.Many2one('openacademy.course',
                                 required=True,
                                 ondelete="cascade")
-    attendee_ids = fields.Many2many('res.partner')
+    attendee_ids = fields.Many2many('res.partner', store=True)
+    attendees_count = fields.Integer(string='# of Attendees', compute='_compute_attendees', store=True)
     active = fields.Boolean('Active', default=True)
     seats = fields.Integer('# of seats')
     taken_seats = fields.Float('Taken seats', compute='_onchange_seats')
 
+    @api.multi
     @api.depends('attendee_ids', 'seats')
     def _onchange_seats(self):
         for i in self:
             if not i.seats:
                 i.taken_seats = 0.0
             else:
-                i.taken_seats = 100.0 * len(i.attendee_ids)/i.seats
+                i.taken_seats = 100.0 * len(i.attendee_ids) / i.seats
 
     @api.onchange('attendee_ids', 'seats', 'taken_seats')
     def _verify_seats(self):
@@ -71,6 +97,7 @@ class OpenacademySession(models.Model):
         self.write({'state': 'done'})
         self.print_message_session()
 
+    @api.multi
     @api.onchange('taken_seats', 'state')
     def _autochange(self):
         for record in self:
@@ -78,6 +105,7 @@ class OpenacademySession(models.Model):
                 record.state = 'confirmed'
 
     @api.model
+    @api.multi
     def create(self, vals):
         result = super(OpenacademySession, self).create(vals)
         result.message_subscribe([result.instruction_id.id])
@@ -89,6 +117,11 @@ class OpenacademySession(models.Model):
         for i in self:
             i.message_subscribe([i.instruction_id.id])
         return result
+
+    @api.depends('attendee_ids')
+    def _compute_attendees(self):
+        for record in self:
+            self.attendees_count = len(record.attendee_ids)
 
 
 # class OpenacademyPartner(models.Model):
@@ -104,4 +137,4 @@ class OpenResPartner(models.Model):
     _inherit = "res.partner"
 
     instructor = fields.Boolean("Instructor", default=False)
-    sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions")
+    sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions", store=True)
