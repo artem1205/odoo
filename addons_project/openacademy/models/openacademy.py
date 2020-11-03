@@ -23,10 +23,11 @@ class OpenacademyCourse(models.Model):
         for session in self:
             self.attendee_count += self.env['res.partner'].search_count(
                 [('sessions_ids.id', 'in', session.session_ids.ids)])
-         #   count = 0.0
-         #   for attend in session.session_ids:
-      #          count += self.env['res.partner'].search_count([('sessions_ids.id', '=', [attend.id])])
-        #self.attendee_count = count
+        #   count = 0.0
+        #   for attend in session.session_ids:
+
+    #          count += self.env['res.partner'].search_count([('sessions_ids.id', '=', [attend.id])])
+    # self.attendee_count = count
 
     @api.multi
     def open_attendees(self):
@@ -138,3 +139,19 @@ class OpenResPartner(models.Model):
 
     instructor = fields.Boolean("Instructor", default=False)
     sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions", store=True)
+
+
+class SessionAddAttendees(models.TransientModel):
+    _name = 'openacademy.session.add_attendees'
+    _description = "Wizard: Quick Registration of Attendees to Sessions"
+
+    def _get_default_attendees(self):
+        return self.env['res.partner'].browse(self._context.get('active_ids'))
+
+    session_id = fields.Many2one('openacademy.session', string='Sessions', required=True)
+    attendee_ids = fields.Many2many('res.partner', string='Attendees', default=_get_default_attendees)
+
+    def subscribe(self):
+        for session in self.session_id:
+            session.attendee_ids |= self.attendee_ids
+        return {}

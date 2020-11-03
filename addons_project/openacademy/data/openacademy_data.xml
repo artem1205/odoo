@@ -81,11 +81,11 @@
             <form string="Openacademy Course Form">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                    <button class="oe_stat_button" type="object" name="open_attendees"
-                        icon="fa-users">
-                        <field string="Attendees" name="attendee_count" widget="statinfo"/>
-                    </button>
-                </div>
+                        <button class="oe_stat_button" type="object" name="open_attendees"
+                                icon="fa-users">
+                            <field string="Attendees" name="attendee_count" widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name"/>
@@ -176,5 +176,4 @@
             </field>
         </field>
     </record>
-
 </odoo>
