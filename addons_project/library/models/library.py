@@ -5,10 +5,9 @@ from odoo import api, fields, models, _
 
 
 class LibraryBook(models.Model):
-
     _inherit = "product.product"
 
-#    name = fields.Char('Name', index=True, required=True)
+    #    name = fields.Char('Name', index=True, required=True)
     author_ids = fields.Many2many('res.partner', string='Author',
                                   index=True, domain="[('partner_type', '=', 'author')]")
     edition_date = fields.Date('Edition Date')
@@ -21,7 +20,7 @@ class LibraryBook(models.Model):
 
     _sql_constrains = [
         ('isbn_uniq', 'unique(isbn)', ' Please enter Unique ISBN.')
-                       ]
+    ]
 
 
 class LibraryCopy(models.Model):
@@ -31,10 +30,29 @@ class LibraryCopy(models.Model):
     book_id = fields.Many2one('product.product', delegate=True, required=True, ondelete="cascade",
                               domain="[('is_book', '=', 'True')]")
     reference = fields.Char(string='Reference', required=True)
-    rental_ids = fields.One2many('library.rental', 'book_id', string='rental #')
+    rental_ids = fields.One2many('library.rental', 'copy_id', string='rental #')
     book_state = fields.Selection([('available', 'Available'),
                                    ('rented', 'Rented'),
                                    ('lost', 'Lost')], default='available')
+    readers_count = fields.Integer(string='Number of Readers', compute='_compute_readers', store=True)
+
+    @api.multi
+    @api.depends('rental_ids.customer_id')
+    def _compute_readers(self):
+        for record in self.book_id:
+            self.readers_count = len(record.rental_ids)
+
+    @api.multi
+    def open_readers(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'All Readers',
+            'view_mode': 'tree',
+            'res_model': 'res.partner',
+            'domain': [('rental_ids.id', 'in', self.rental_ids.ids)],
+            'context': "{'create': False}"
+        }
 
 
 class LibraryRental(models.Model):
@@ -73,7 +91,7 @@ class LibraryRental(models.Model):
                                             'amount': sum,
                                             'customer_id': self.customer_id.id})
 
-#       action buttons
+    #       action buttons
     @api.multi
     def action_confirm(self):
         self.write({'state': 'rented'})
@@ -95,7 +113,7 @@ class LibraryRental(models.Model):
                         'active': False})
         self._add_fee(type='loss')
 
-# Cron for email reminder
+    # Cron for email reminder
     @api.one
     def search_for_debtors(self):
         for debtors in self:
@@ -103,17 +121,18 @@ class LibraryRental(models.Model):
                 print('!!!!!!!!!!!!sending email !!!!!!!!!!!')
                 template_id = debtors.env.ref('library.debtor_remainder_mail_template').id
                 self.env['mail.template'].browse(template_id).send_mail(debtors.id, force_send=True)
+
+
 #        for email in self.customer_email:
 #            listdebtor = email.env['library.rental'].search([('return_date', '<', date.today())])
-
 
 
 class Partner(models.Model):
     _inherit = "res.partner"
 
-#    name = fields.Char('Name', required=True, store=True)
-#    email = fields.Char('E-mail', store=True)
-#    address = fields.Text('Address', store=True)
+    #    name = fields.Char('Name', required=True, store=True)
+    #    email = fields.Char('E-mail', store=True)
+    #    address = fields.Text('Address', store=True)
     partner_type = fields.Selection([('customer', 'Customer'),
                                      ('author', 'Author'),
                                      ('publisher', 'Publisher')])
@@ -126,7 +145,44 @@ class Partner(models.Model):
         for payment in self.payment_ids:
             self.amount_owed += payment.amount
 
+
 # class LibraryPublisher(models.Model):
 #    _name = "library.publisher"
 #
 #    name = fields.Char('Name', required=True)
+
+
+class SessionAddAttendees(models.TransientModel):
+    _name = 'library.rental.add_books'
+    _description = "Wizard: Add Books"
+
+    def _get_default_copies(self):
+        print(self.env['library.copy'].browse(self._context.get('active_ids')))
+        return self.env['library.copy'].browse(self._context.get('active_ids'))
+
+    copy_ids = fields.Many2many('library.copy', string='Book Copies', default=_get_default_copies)
+    customer_id = fields.Many2one('res.partner', string='Customers')
+    rental_ids = fields.Many2many('library.rental', string='Rentals')
+    return_date = fields.Date(string='Return Date')
+
+    def add_books(self):
+        rental_env = self.env['library.rental']
+        for wiz in self:
+            for copy in wiz.copy_ids:
+                # for rental in self.rental_ids:
+                rental_env.create({
+                    'return_date': wiz.return_date,
+                    'copy_id': copy.id,
+                    'customer_id': wiz.customer_id.id,
+                    'rental_date': date.today(),
+                    'planned_return_date': date.today(),
+                })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Rental form',
+            'view_mode': 'tree',
+            'res_model': 'library.rental',
+            'domain': ['&', ('customer_id', '=', self.customer_id.id),
+                       ('state', '=', 'draft')],
+            'context': "{'create': False}"
+        }

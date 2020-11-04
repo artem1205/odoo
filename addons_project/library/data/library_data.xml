@@ -48,7 +48,6 @@
     </record>
 
 
-
     <menuitem name="Library"
               id="library_root"
               web_icon="library,static/description/icon.png"
@@ -63,9 +62,6 @@
     <menuitem id="menu_rentals" name="Rentals" parent="library_menu_rentals" action="action_menu_rentals"/>
     <menuitem id="library_menu_price" name="Price" parent="library_root"/>
     <menuitem id="menu_price" name="Price" parent="library_menu_price" action="action_menu_price"/>
-
-
-
 
 
     <record id="library_books_search_view" model="ir.ui.view">
@@ -112,9 +108,17 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
-            <header>
-                <field name="book_state" widget="statusbar" statusbar_visible="available,rented,lost"/>
-            </header>
+                <header>
+                    <field name="book_state" widget="statusbar" statusbar_visible="available,rented,lost"/>
+                </header>
+            </xpath>
+            <xpath expr="//group" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button class="oe_stat_button" type="object" name="open_readers"
+                            icon="fa-users">
+                        <field string="Readers" name="readers_count" widget="statinfo"/>
+                    </button>
+                </div>
             </xpath>
             <group>
                 <group>

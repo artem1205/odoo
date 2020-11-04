@@ -29,6 +29,7 @@
         "data/library_data.xml",
         "data/library.price.csv",
         "data/cron_job_email.xml",
+        "data/rental_wizard.xml"
     ],
     # only loaded in demonstration mode
     'demo':        [],
