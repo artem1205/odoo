@@ -94,7 +94,8 @@
                     <group>
                         <group>
                             <field name="description" string="Description"/>
-                            <field name="responsible_id"/>
+                            <field name="can_edit_responsible" invisible="True"/>
+                            <field name="responsible_id" attrs="{'readonly':[('can_edit_responsible','=', False),('id','>',0)]}"/>
                         </group>
                         <group>
                             <field name="level"/>
@@ -113,12 +114,17 @@
             <form string="Openacademy Session Form">
                 <header>
                     <button name="action_draft" type="object" string='Reset to draft'
-                            attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                            attrs="{'invisible': [('state', '=', 'draft')]}"
+                            groups="openacademy.group_openacademy_maesters"/>
                     <button name="action_confirm" type="object" string='Confirm'
+                            groups="openacademy.group_openacademy_maesters"
                             attrs="{'invisible': ['|',('state', '=', 'confirmed'),('state', '=', 'done')]}"/>
                     <button name="action_mark_done" type="object" string='Mark as Done'
+                            groups="openacademy.group_openacademy_maesters"
                             attrs="{'invisible': ['|',('state', '=', 'draft'),('state', '=', 'done')]}"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                    <field name="state" widget="statusbar"
+                           groups="openacademy.group_openacademy_maesters"
+                           statusbar_visible="draft,confirmed,done"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -130,7 +136,7 @@
                         <group>
                             <field name="instruction_id" domain="[('instructor','=','True')]"/>
                             <field name="course_id"/>
-                            <field name="seats"/>
+                            <field name="seats" groups="module_category_openacademy.group_openacademy_maesters"/>
                             <field name="taken_seats" widget="progressbar"/>
                         </group>
                         <group>
@@ -139,7 +145,8 @@
                             <field name="duration"/>
                         </group>
                     </group>
-                    <field name="attendee_ids"/>
+                    <field name="attendee_ids" domain="[('level','>=','course_id.level')]"
+                           groups="openacademy.group_openacademy_maesters"/>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>

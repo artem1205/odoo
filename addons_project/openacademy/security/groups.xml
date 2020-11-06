@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.module.category" id="module_category_openacademy">
+        <field name="name"> Openacademy Management</field>
+        <field name="description">Category for Openacademy</field>
+        <field name="sequence">48</field>
+    </record>
+
+    <record id="group_openacademy_apprentices" model="res.groups">
+        <field name="name">Apprentices</field>
+        <field name="category_id" ref="module_category_openacademy"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_openacademy_maesters" model="res.groups">
+        <field name="name">Maesters</field>
+        <field name="category_id" ref="module_category_openacademy"/>
+        <field name="implied_ids" eval="[(4, ref('group_openacademy_apprentices'))]"/>
+    </record>
+
+    <record model="ir.rule" id="course_record_rule">
+        <field name="name">Edit only Maesters</field>
+        <field name="model_id" ref="model_openacademy_session"/>
+        <field name="domain_force">[('responsible_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_openacademy_maesters'))]"/>
+    </record>
+
+   <record id="group_openacademy_archmmaesters" model="res.groups">
+        <field name="name">Archmmaesters</field>
+        <field name="category_id" ref="module_category_openacademy"/>
+        <field name="implied_ids" eval="[(4, ref('group_openacademy_maesters'))]"/>
+    </record>
+
+    <record model="ir.rule" id="course_record_rule_archmmaesters">
+        <field name="name">Edit only Archmmaesters</field>
+        <field name="model_id" ref="model_openacademy_session"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_openacademy_archmmaesters'))]"/>
+    </record>
+
+</odoo>

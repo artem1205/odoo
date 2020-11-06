@@ -1,1 +1,5 @@
 id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+acl_session_students,openacademy.session_students,model_openacademy_session,base.group_user,1,0,0,0
+acl_session,openacademy.session_responsible,model_openacademy_session,group_openacademy_maesters,1,1,1,1
+acl_course_students,openacademy.course_students,model_openacademy_course,base.group_user,1,0,0,0
+acl_course,openacademy.course_responsible,model_openacademy_course,group_openacademy_maesters,1,1,1,1

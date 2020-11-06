@@ -26,8 +26,9 @@
     # always loaded
     'data':        [
         "security/ir.model.access.csv",
-        "data/openacademy_data.xml",
+        "security/groups.xml",
         "data/session_wizard.xml",
+        "data/openacademy_data.xml"
     ],
     # only loaded in demonstration mode
     'demo':        [],

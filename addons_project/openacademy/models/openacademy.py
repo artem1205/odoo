@@ -16,6 +16,7 @@ class OpenacademyCourse(models.Model):
                               ('medium', 'Medium'),
                               ('hard', 'Hard')])
     attendee_count = fields.Integer("# of Attendees", compute='_number_of_attendees_course', store=True)
+    can_edit_responsible = fields.Boolean(string='Can Edit ?', store=False, compute='_compute_responsible')
 
     @api.multi
     @api.depends('session_ids')
@@ -41,6 +42,15 @@ class OpenacademyCourse(models.Model):
             'context': "{'create': False}"
         }
 
+ #   @api.onchange('self.env.user')
+    def _compute_responsible(self):
+        archmaesters_group = self.env['res.groups'].search([('name', '=', 'Archmmaesters')])
+        print(archmaesters_group)
+        print(self.env.user.id, archmaesters_group.users.ids)
+        if self.env.user.id in archmaesters_group.users.ids:
+            print(True)
+            self.can_edit_responsible = True
+
 
 class OpenacademySession(models.Model):
     _name = "openacademy.session"
@@ -63,6 +73,7 @@ class OpenacademySession(models.Model):
     active = fields.Boolean('Active', default=True)
     seats = fields.Integer('# of seats')
     taken_seats = fields.Float('Taken seats', compute='_onchange_seats')
+    level = fields.Selection(related='course_id.level')
 
     @api.multi
     @api.depends('attendee_ids', 'seats')
@@ -139,7 +150,7 @@ class OpenResPartner(models.Model):
 
     instructor = fields.Boolean("Instructor", default=False)
     sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions", store=True)
-
+    level = fields.Integer(string="Level")
 
 class SessionAddAttendees(models.TransientModel):
     _name = 'openacademy.session.add_attendees'
