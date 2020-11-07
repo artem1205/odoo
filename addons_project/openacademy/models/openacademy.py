@@ -12,9 +12,9 @@ class OpenacademyCourse(models.Model):
     description = fields.Text()
     responsible_id = fields.Many2one('res.partner')
     session_ids = fields.One2many('openacademy.session', 'course_id', string='Session')
-    level = fields.Selection([('easy', 'Easy'),
-                              ('medium', 'Medium'),
-                              ('hard', 'Hard')])
+    level = fields.Selection([('1', 'Easy'),
+                              ('2', 'Medium'),
+                              ('3', 'Hard')])
     attendee_count = fields.Integer("# of Attendees", compute='_number_of_attendees_course', store=True)
     can_edit_responsible = fields.Boolean(string='Can Edit ?', store=False, compute='_compute_responsible')
 
@@ -66,14 +66,22 @@ class OpenacademySession(models.Model):
     course_id = fields.Many2one('openacademy.course',
                                 required=True,
                                 ondelete="cascade")
-    attendee_ids = fields.Many2many('res.partner', store=True)
+
+    def _get_level(self):
+        attend_list = []
+        course_model = self.env['res.partner'].search([('level', '>=', self.level)])
+        attend_list += course_model.ids
+        domain = [('id', 'in', attend_list)]
+        return domain
+
+    attendee_ids = fields.Many2many('res.partner', store=True, domain=_get_level)
     attendees_count = fields.Integer(string='# of Attendees', compute='_compute_attendees', store=True)
     active = fields.Boolean('Active', default=True)
     seats = fields.Integer('# of seats')
     taken_seats = fields.Float('Taken seats', compute='_onchange_seats')
-    level = fields.Selection(related='course_id.level')
     is_paid = fields.Boolean(string='Is paid')
     product_id = fields.Many2one('product_template', string='Product')
+    level = fields.Selection(string='Level', related='course_id.level')
 
     @api.depends('attendee_ids', 'seats')
     def _onchange_seats(self):
@@ -106,47 +114,47 @@ class OpenacademySession(models.Model):
         self.print_message_session()
 
     def invoice_teacher(self):
-        # expense_account = self.env['account.account'].search(
-        #     [('user_type_id', '=', self.env.ref('account.data_account_type_expenses').id)], limit=1)
-        # if not self.env['account.move'].search('partner_id', '=', self.instruction_id):
-        #     self.env['account.move'].create({
-        #         'partner_id': self.instruction_id,
-        #         'default_type': 'out_invoice',
-        #         'date': date.today(),
-        #         'state': 'draft',
-        #         'line_ids': {
-        #             'partner_id': self.instruction_id.id,
-        #             'price_unit': self.product_id.lst_price,
-        #             'account_id': expense_account.id,
-        #             'product_id': self.product_id.id
-        #         }
-        #     })
-        # self.is_paid = True
-        pass
+        expense_account = self.env['account.account'].search(
+            [('user_type_id', '=', self.env.ref('account.data_account_type_expenses').id)], limit=1)
+        if not self.env['account.move'].search([('partner_id', '=', self.instruction_id.id)]):
+            self.env['account.move'].create({
+                'partner_id': self.instruction_id.id,
+                'invoice_date': date.today(),
+                'type': 'out_invoice',
+                'state': 'draft',
+                'invoice_line_ids': [0, 0, {
+                    'partner_id': self.instruction_id.id,
+                    'price_unit': self.env['product.template'].search([('id', '=', 1)]).list_price,
+                    'account_id': expense_account.id,
+                    'product_id': self.env['product.template'].search([('id', '=', 1)]).id,
+                    'name': self.env['product.template'].search([('id', '=', 1)]).name,
+                    # 'quantity': 1,
+                }]
+            })
+        self.is_paid = True
 
-        @api.onchange('taken_seats', 'state')
-        def _autochange(self):
-            for record in self:
-                if record.taken_seats >= 50 and record.state == 'draft':
-                    record.state = 'confirmed'
+    @api.onchange('taken_seats', 'state')
+    def _autochange(self):
+        for record in self:
+            if record.taken_seats >= 50 and record.state == 'draft':
+                record.state = 'confirmed'
 
-        @api.model
+    @api.model
+    def create(self, vals):
+        result = super(OpenacademySession, self).create(vals)
+        result.message_subscribe([result.instruction_id.id])
+        return result
 
-        def create(self, vals):
-            result = super(OpenacademySession, self).create(vals)
-            result.message_subscribe([result.instruction_id.id])
-            return result
+    def write(self, vals):
+        result = super(OpenacademySession, self).write(vals)
+        for i in self:
+            i.message_subscribe([i.instruction_id.id])
+        return result
 
-        def write(self, vals):
-            result = super(OpenacademySession, self).write(vals)
-            for i in self:
-                i.message_subscribe([i.instruction_id.id])
-            return result
-
-        @api.depends('attendee_ids')
-        def _compute_attendees(self):
-            for record in self:
-                self.attendees_count = len(record.attendee_ids)
+    @api.depends('attendee_ids')
+    def _compute_attendees(self):
+        for record in self:
+            self.attendees_count = len(record.attendee_ids)
 
     # class OpenacademyPartner(models.Model):
     #    _name = "openacademy.partner"
@@ -156,24 +164,26 @@ class OpenacademySession(models.Model):
     #    session_id = fields.Many2many('openacademy.session',
     #                                  readonly=True)
 
-    class OpenResPartner(models.Model):
-        _inherit = "res.partner"
 
-        instructor = fields.Boolean("Instructor", default=False)
-        sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions", store=True)
-        level = fields.Integer(string="Level")
+class OpenResPartner(models.Model):
+    _inherit = "res.partner"
 
-    class SessionAddAttendees(models.TransientModel):
-        _name = 'openacademy.session.add_attendees'
-        _description = "Wizard: Quick Registration of Attendees to Sessions"
+    instructor = fields.Boolean("Instructor", default=False)
+    sessions_ids = fields.Many2many('openacademy.session', readonly=True, string="Sessions", store=True)
+    level = fields.Integer(string="Level")
 
-        def _get_default_attendees(self):
-            return self.env['res.partner'].browse(self._context.get('active_ids'))
 
-        session_id = fields.Many2one('openacademy.session', string='Sessions', required=True)
-        attendee_ids = fields.Many2many('res.partner', string='Attendees', default=_get_default_attendees)
+class SessionAddAttendees(models.TransientModel):
+    _name = 'openacademy.session.add_attendees'
+    _description = "Wizard: Quick Registration of Attendees to Sessions"
 
-        def subscribe(self):
-            for session in self.session_id:
-                session.attendee_ids |= self.attendee_ids
-            return {}
+    def _get_default_attendees(self):
+        return self.env['res.partner'].browse(self._context.get('active_ids'))
+
+    session_id = fields.Many2one('openacademy.session', string='Sessions', required=True)
+    attendee_ids = fields.Many2many('res.partner', string='Attendees', default=_get_default_attendees)
+
+    def subscribe(self):
+        for session in self.session_id:
+            session.attendee_ids |= self.attendee_ids
+        return {}
