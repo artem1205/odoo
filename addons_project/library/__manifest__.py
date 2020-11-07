@@ -25,11 +25,11 @@
 
     # always loaded
     'data':        [
-        "security/ir.model.access.csv",
         "data/library_data.xml",
         "data/library.price.csv",
         "data/cron_job_email.xml",
-        "data/rental_wizard.xml"
+        "data/rental_wizard.xml",
+        "security/ir.model.access.csv",
     ],
     # only loaded in demonstration mode
     'demo':        [],

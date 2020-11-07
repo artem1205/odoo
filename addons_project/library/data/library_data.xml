@@ -5,7 +5,6 @@
         <field name="name">Books</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.product</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('is_book','=','True')]</field>
         <field name="help" type="html">
@@ -19,7 +18,6 @@
         <field name="name">Copies</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">library.copy</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -27,7 +25,6 @@
         <field name="name">Partners</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.partner</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -35,7 +32,6 @@
         <field name="name">Rentals</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">library.rental</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -43,7 +39,6 @@
         <field name="name">Price</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">library.price</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -70,6 +65,33 @@
         <field name="arch" type="xml">
             <search string="Search Books">
                 <field name="name" string="name" filter_domain="[('name','ilike',self)]"/>
+                <field name="isbn" string="ISBN" filter_domain="[('isbn','ilike',self)]"/>
+                <field name="display_name" string="Name" filter_domain="[('display_name','ilike',self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="library_copies_tree" model="ir.ui.view">
+        <field name="name">library.copies.tree</field>
+        <field name="model">library.copy</field>
+        <field name="arch" type="xml">
+            <tree string="Library Copies Tree"
+                  decoration-success="book_state == 'available'">
+                <field name="display_name"/>
+                <!--                <field name="name"/>-->
+                <field name="reference"/>
+                <field name="isbn"/>
+                <field name="book_state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="library_copies_search_view" model="ir.ui.view">
+        <field name="name">library.copy.search</field>
+        <field name="model">library.copy</field>
+        <field name="arch" type="xml">
+            <search string="Search Books">
+                <field name="display_name" string="Name" filter_domain="[('display_name','ilike',self)]"/>
                 <field name="isbn" string="ISBN" filter_domain="[('isbn','ilike',self)]"/>
             </search>
         </field>
@@ -143,6 +165,7 @@
             </tree>
         </field>
     </record>
+
 
     <record id="library_partners_search_view" model="ir.ui.view">
         <field name="name">library.partners.search</field>

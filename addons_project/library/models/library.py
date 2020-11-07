@@ -35,14 +35,13 @@ class LibraryCopy(models.Model):
                                    ('rented', 'Rented'),
                                    ('lost', 'Lost')], default='available')
     readers_count = fields.Integer(string='Number of Readers', compute='_compute_readers', store=True)
+    display_name = fields.Char(string="Name", compute='_get_display_name', store=True)
 
-    @api.multi
     @api.depends('rental_ids.customer_id')
     def _compute_readers(self):
         for record in self.book_id:
             self.readers_count = len(record.rental_ids)
 
-    @api.multi
     def open_readers(self):
         self.ensure_one()
         return {
@@ -53,6 +52,11 @@ class LibraryCopy(models.Model):
             'domain': [('rental_ids.id', 'in', self.rental_ids.ids)],
             'context': "{'create': False}"
         }
+
+    @api.depends('reference', 'book_id.name')
+    def _get_display_name(self):
+        for rec in self:
+            self.display_name = rec.book_id.name + " REF: " + rec.reference
 
 
 class LibraryRental(models.Model):
@@ -79,7 +83,6 @@ class LibraryRental(models.Model):
                               ('returned', 'Returned'),
                               ('lost', 'Lost')], default='draft')
 
-    @api.multi
     def _add_fee(self, type):
         if type == 'time':
             day_of_rental = (self.return_date - self.rental_date)
@@ -91,21 +94,18 @@ class LibraryRental(models.Model):
                                             'amount': sum,
                                             'customer_id': self.customer_id.id})
 
-    #       action buttons
-    @api.multi
+    # action buttons
     def action_confirm(self):
         self.write({'state': 'rented'})
         for book in self.copy_id:
             book.write({'book_state': 'rented'})
         self._add_fee(type='time')
 
-    @api.multi
     def action_return(self):
         self.write({'state': 'returned'})
         for book in self.copy_id:
             book.write({'book_state': 'available'})
 
-    @api.multi
     def action_lost(self):
         self.write({'state': 'lost'})
         for book in self.copy_id:
@@ -114,7 +114,6 @@ class LibraryRental(models.Model):
         self._add_fee(type='loss')
 
     # Cron for email reminder
-    @api.one
     def search_for_debtors(self):
         for debtors in self:
             if debtors.state == 'rented' and date.today() > debtors.return_date:

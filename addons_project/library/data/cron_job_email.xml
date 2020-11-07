@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
         <record id="debtor_remainder_cron" model="ir.cron">
             <field name="name">Debtor: Debtor remainder</field>
             <!--            <field name="user_id" ref="base.user_root"/> -->
@@ -12,5 +11,4 @@
             <field name="interval_number">1</field>
             <field name="numbercall">-1</field>
         </record>
-    </data>
 </odoo>
