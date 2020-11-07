@@ -4,7 +4,6 @@
         <field name="name">Courses</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">openacademy.course</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class='o_view_nocontent_smiling_face'>
@@ -17,7 +16,6 @@
         <field name="name">Sessions</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">openacademy.session</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -25,7 +23,6 @@
         <field name="name">Partners</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.partner</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -122,6 +119,9 @@
                     <button name="action_mark_done" type="object" string='Mark as Done'
                             groups="openacademy.group_openacademy_maesters"
                             attrs="{'invisible': ['|',('state', '=', 'draft'),('state', '=', 'done')]}"/>
+                    <button name="invoice_teacher" type="object" string='Invoice Teacher'
+                            groups="openacademy.group_openacademy_maesters"
+                            attrs="{'invisible': ['|',('state', '=', 'draft'),('state', '=', 'done')]}"/>
                     <field name="state" widget="statusbar"
                            groups="openacademy.group_openacademy_maesters"
                            statusbar_visible="draft,confirmed,done"/>
@@ -136,7 +136,7 @@
                         <group>
                             <field name="instruction_id" domain="[('instructor','=','True')]"/>
                             <field name="course_id"/>
-                            <field name="seats" groups="module_category_openacademy.group_openacademy_maesters"/>
+                            <field name="seats" groups="openacademy.group_openacademy_maesters"/>
                             <field name="taken_seats" widget="progressbar"/>
                         </group>
                         <group>

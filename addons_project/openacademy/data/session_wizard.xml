@@ -2,11 +2,10 @@
 <odoo>
     <act_window id="session_add_attendees_action"
                 name="Add Attendees"
-                src_model="res.partner"
+                binding_model="res.partner"
                 res_model="openacademy.session.add_attendees"
                 view_mode="form"
-                target="new"
-                key2="client_action_multi"/>
+                target="new"/>
 
     <record model="ir.ui.view" id="session_add_attendees_view_form">
         <field name="name">session.add_attendees.form</field>
