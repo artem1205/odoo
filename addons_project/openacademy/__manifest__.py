@@ -29,6 +29,7 @@
         "data/session_wizard.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
+        "report/invitation_letter.xml",
     ],
     # only loaded in demonstration mode
     'demo':        [],

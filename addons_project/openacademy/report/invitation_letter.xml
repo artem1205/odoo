@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report
+            id="openacademy_session_print_letter"
+            string="Print Letter"
+            model="openacademy.session"
+            report_type="qweb-pdf"
+            name="openacademy.print_letter"
+            file="openacademy.print_letter"
+            print_report_name="'Print Letter - %s' % (object.name).replace('/', '')"
+    />
+
+    <template id="print_letter">
+
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-foreach="docs" t-as="session">
+                        <h5 style="text-align:center !important;">
+                            <b><u> Invitation Letter</u></b>
+                            <br><b><u> Session <span t-field="session.name"/></u></b></br>
+                        </h5>
+                        <br></br>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-left">
+                                        Dear Attendee.
+                                        <br>You are invite to the training. Check the information below.</br>
+                                    </th>
+                                    <th>
+                                        <img alt="barcode"
+                                             t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', session.name, 600, 120)"
+                                             style="max-height:50pt;max-width:100%;" align="right"/>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <br></br>
+                        <table class="table table-bordered table-sm m-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%" class="text-left">Start Date</th>
+                                    <th class="text-center">End Date</th>
+                                    <th class="text-center">Duration</th>
+                                    <th class="text-center">Instructor</th>
+                                    <th class="text-right">Course</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table table-bordered table-sm m-0">
+                                <td class="text-left">
+                                    <span t-field="session.start_date"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="session.end_date"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="session.duration"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="session.instruction_id.name"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="session.course_id.name"/>
+                                </td>
+                            </tbody>
+                        </table>
+                        <br></br>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Attendee</th>
+                                    <th class="text-center">Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="session.attendee_ids" t-as="attend">
+                                    <tr>
+                                        <td class="text-left">
+                                            <span t-field="attend.name"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="attend.street"/>, <span t-field="attend.city"/>, <span
+                                                t-field="attend.state_id.name"/>, <span t-field="attend.zip"/>, <span
+                                                t-field="attend.country_id.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
