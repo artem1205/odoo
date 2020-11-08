@@ -21,7 +21,7 @@
     'version':     '0.1',
 
     # any module necessary for this one to work correctly
-    'depends':     ['base', 'product', 'mail', 'portal'],
+    'depends':     ['base', 'product', 'mail', 'portal', 'website'],
 
     # always loaded
     'data':        [
@@ -29,6 +29,7 @@
         "data/library.price.csv",
         "data/cron_job_email.xml",
         "data/rental_wizard.xml",
+        "data/website_book.xml",
         "security/ir.model.access.csv",
     ],
     # only loaded in demonstration mode

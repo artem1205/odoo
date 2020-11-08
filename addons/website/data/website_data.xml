@@ -143,7 +143,7 @@
         <record id="menu_home" model="website.menu">
             <field name="name">Home</field>
             <field name="url">/</field>
-            <field name="parent_id" ref="website.main_menu"/>
+            <field name="is_published">True</field>
             <field name="sequence" type="int">10</field>
         </record>
         <record id="menu_contactus" model="website.menu">

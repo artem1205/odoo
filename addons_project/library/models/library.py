@@ -56,7 +56,7 @@ class LibraryCopy(models.Model):
     @api.depends('reference', 'book_id.name')
     def _get_display_name(self):
         for rec in self:
-            self.display_name = rec.book_id.name + " REF: " + rec.reference
+            self.display_name = str(rec.book_id.name) + " REF: " + str(rec.reference)
 
 
 class LibraryRental(models.Model):
