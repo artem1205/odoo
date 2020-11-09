@@ -20,7 +20,7 @@ class Library(http.Controller):
     def index(self, **kw):
         Books = http.request.env['library.copy']
         return http.request.render('library.index', {
-            'books': Books.search([])
+            'books': Books.search([('book_state', '!=', 'lost')])
         })
     # def books(self, **kw):
     #     books = request.env['library.copy'].sudo().search([])
