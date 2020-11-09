@@ -2,8 +2,9 @@
 <odoo>
 
     <record id="library_books" model="website.menu">
-        <field name="name">Books</field>
+        <field name="name">Library Books</field>
         <field name="url">/library</field>
+        <field name="is_published">True</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence" type="int">20</field>
     </record>
@@ -14,37 +15,9 @@
             <t t-set="title"> Library copies</t>
             <div class="oe_structure">
                 <div class="container">
-                    <table class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
-                           style="table-layout:auto">
-                        <thead>
-                            <tr>
-                                <td>
-                                    Reference
-                                </td>
-                                <td>
-                                    Name
-                                </td>
-                                <td>
-                                    Status
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="books" t-as="book">
-                                <tr onclick="wizard_open()">
-                                    <td>
-                                        <t t-esc="book.reference"/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="book.name"/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="book.book_state"/>
-                                    </td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
+                    <t t-foreach="books" t-as="book">
+                        <p><t t-esc="book.id"/> <t t-esc="book.name"/></p>
+                    </t>
                 </div>
             </div>
         </t>
