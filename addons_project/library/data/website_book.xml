@@ -15,7 +15,8 @@
             <div class="oe_structure">
                 <div class="container">
                     <div class="span4 proj-div" data-toggle="modal" data-target="#GSCCModal">
-                        <table class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
+                        <table id="library_list"
+                               class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
                                style="table-layout:auto">
                             <thead>
                                 <tr>
@@ -105,13 +106,19 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                    <button type="button" class="btn btn-primary">Confirm</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <script type="text/javascript">
+                $('#library_list tr').click(get_ref_func(){
+                var referenceid = $(this).children().closest('td').html()
+                alert( referenceid);
+                });
+            </script>
         </t>
     </template>
 

@@ -1,2 +1,5 @@
-odoo.define('website.demo_js_book', function () {
+$("#library_list tr").click(function(){
+var referenceid = $(this).children().closest("td").html()
+
+    alert( referenceid);
 });
