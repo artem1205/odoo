@@ -14,37 +14,102 @@
             <t t-set="title"> Library copies</t>
             <div class="oe_structure">
                 <div class="container">
-                    <table class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
-                           style="table-layout:auto">
-                        <thead>
-                            <tr>
-                                <td>
-                                    Reference
-                                </td>
-                                <td>
-                                    Name
-                                </td>
-                                <td>
-                                    Status
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="books" t-as="book">
-                                <tr onclick="wizard_open_check()">
+                    <div class="span4 proj-div" data-toggle="modal" data-target="#GSCCModal">
+                        <table class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
+                               style="table-layout:auto">
+                            <thead>
+                                <tr>
                                     <td>
-                                        <t t-esc="book.reference"/>
+                                        Reference
                                     </td>
                                     <td>
-                                        <t t-esc="book.name"/>
+                                        Name
                                     </td>
                                     <td>
-                                        <t t-esc="book.book_state"/>
+                                        Status
                                     </td>
                                 </tr>
-                            </t>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="books" t-as="book">
+                                    <tr>
+                                        <td>
+                                            <t t-esc="book.reference"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="book.name"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="book.book_state"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="GSCCModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel">Are you sure you want to rent this
+                                        book?</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
+                                           style="table-layout:auto">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    Book Name
+                                                </td>
+                                                <td>
+                                                    id"name"
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    ISBN
+                                                </td>
+                                                <td>
+                                                    id"isbn"
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Reference
+                                                </td>
+                                                <td>
+                                                    id"reference"
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Authors
+                                                </td>
+                                                <td>
+                                                    id"authors"
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Publisher
+                                                </td>
+                                                <td>
+                                                    id"publisher"
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </t>
