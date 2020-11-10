@@ -113,12 +113,13 @@
                     </div>
                 </div>
             </div>
-            <script type="text/javascript">
-                $('#library_list tr').click(get_ref_func(){
-                var referenceid = $(this).children().closest('td').html()
-                alert( referenceid);
-                });
-            </script>
+                    <script type ="text/javascript">
+                        $('#library_list tr').click(function get_ref_number(){
+                        var referenceid = $(this).children().closest('td').html()
+                        alert( referenceid);
+                        return referenceid;
+                        });
+                    </script>
         </t>
     </template>
 
