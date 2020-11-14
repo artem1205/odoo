@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+        <record id="openacademy_sessions" model="website.menu">
+            <field name="name">Sessions</field>
+            <field name="url">/openacademy/sessions</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <!--            <field name="sequence">87</field>-->
+        </record>
+        <record id="openacademy_courses" model="website.menu">
+            <field name="name">Courses</field>
+            <field name="url">/openacademy/courses</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <!--            <field name="sequence">86</field>-->
+        </record>
+    </data>
+
+    <template id="courses" name="Courses">
+        <t t-call="website.layout">
+            <t t-set="title"> Openacademy courses</t>
+            <div class="oe_structure">
+                <div class="container">
+                    <h2>Courses list:</h2>
+                    <ul>
+                        <t t-foreach="copies" t-as="copy">
+                            <li>
+                                <a t-attf-href="/openacademy/{{courses.id}}">
+                                    <b><t t-esc="copy.book_id.name"/></b>
+                                    <span class="small">(<t t-esc="copy.reference"/>)</span>
+                                </a>
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

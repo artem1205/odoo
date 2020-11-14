@@ -21,12 +21,13 @@
     'version':     '0.1',
 
     # any module necessary for this one to work correctly
-    'depends':     ['base', 'portal', 'mail', 'account', 'product'],
+    'depends':     ['base', 'portal', 'mail', 'account', 'product', 'website'],
 
     # always loaded
     'data':        [
         "data/openacademy_data.xml",
         "data/session_wizard.xml",
+        "data/openacademy_website.xml",
         "security/groups.xml",
         "security/ir.model.access.csv",
         "report/invitation_letter.xml",
