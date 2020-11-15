@@ -31,14 +31,14 @@ class OpenacademyWebform(http.Controller):
         })
 
     @http.route('/openacademy/sessions', auth='public', website=True)
-    def courses(self, **kw):
+    def sessions(self, **kw):
         Sessions = http.request.env['openacademy.session']
         return http.request.render('openacademy.sessions', {
             'sessions': Sessions.search([])
         })
 
     @http.route('/openacademy/sessions/<int:id>', auth='public', website=True)
-    def course(self, id):
+    def session(self, id):
         session = http.request.env['openacademy.session'].search([('id', '=', id)])
         return http.request.render('openacademy.session_page', {
             'session': session
