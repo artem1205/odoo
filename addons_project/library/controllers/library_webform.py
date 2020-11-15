@@ -1,31 +1,40 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import json
-import werkzeug
-import itertools
-import pytz
-import babel.dates
-from collections import OrderedDict
+import datetime
 
 from odoo import http, fields
-from odoo.addons.http_routing.models.ir_http import slug, unslug
-from odoo.addons.website.controllers.main import QueryURL
 from odoo.http import request
-from odoo.tools import html2plaintext
 
 
 class Library(http.Controller):
-    @http.route('/library/', auth='public', website=True)
+    @http.route('/library/', auth='user', website=True)
     def index(self, **kw):
         Books = http.request.env['library.copy']
-        return http.request.render('library.index', {
+        return http.request.render('library.copy_list', {
             'books': Books.search([('book_state', '!=', 'lost')])
         })
-    # def books(self, **kw):
-    #     books = request.env['library.copy'].sudo().search([])
-    #     html_result = '<html><body><ul>'
-    #     for book in books:
-    #         html_result += "<li> %s </li>" % book.name
-    #     html_result += '</ul></body></html>'
-    #     return html_result
+
+    @http.route('/library/<int:id>', auth='user', website=True)
+    def book_check_info(self, id):
+        book = http.request.env['library.copy'].search([('id', '=', id)])
+        if book.book_state != 'available':
+            return request.render('library.rental_decline', {'book': book})
+        else:
+            return http.request.render('library.book_page', {
+                'book': book
+            })
+
+    @http.route('/library/rent/<int:id>', auth='user', website=True)
+    def rent(self, id):
+        partner = http.request.env.user.partner_id
+        copy = http.request.env['library.copy'].search([('id', '=', id)])
+        rental = http.request.env['library.rental'].create({
+            'copy_id': copy.id,
+            'customer_id': partner.id,
+            'rental_date': datetime.date.today(),
+            'planned_return_date': datetime.date.today() + datetime.timedelta(days=30),
+            'return_date': datetime.date.today() + datetime.timedelta(days=30),
+        })
+        rental.action_confirm()
+        return request.render('/library/success', {})

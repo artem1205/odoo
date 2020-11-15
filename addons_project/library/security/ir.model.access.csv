@@ -1,1 +1,5 @@
 id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+rental_manager,Library_manager,model_library_rental,,1,1,1,1
+book_manager,Library_book_manager,model_library_copy,,1,1,1,1
+price_manager,Library_price_manager,model_library_price,,1,1,1,1
+payment_manager,Library_payment_manager,model_library_payment,,1,1,1,1
