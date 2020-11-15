@@ -23,15 +23,189 @@
                 <div class="container">
                     <h2>Courses list:</h2>
                     <ul>
-                        <t t-foreach="copies" t-as="copy">
+                        <t t-foreach="courses" t-as="course">
                             <li>
-                                <a t-attf-href="/openacademy/{{courses.id}}">
-                                    <b><t t-esc="copy.book_id.name"/></b>
-                                    <span class="small">(<t t-esc="copy.reference"/>)</span>
+                                <a t-attf-href="/openacademy/courses/{{course.id}}">
+                                    <b><t t-esc="course.name"/></b>
                                 </a>
                             </li>
                         </t>
                     </ul>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="course_page">
+        <t t-call="website.layout">
+            <t t-set="title">Course information</t>
+            <div class="oe_structure"></div>
+            <div class="oe_structure">
+                <div class="container">
+                    <h2>Course Information:</h2>
+                    <div>
+                        <table id="course_data" class="table table-bordered table-striped table-hover text-center"
+                               style="table-layout:auto">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        Name
+                                    </td>
+                                    <td>
+                                        Responsible
+                                    </td>
+                                    <td>
+                                        Level
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <t t-esc="course.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="course.responsible_id.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="course.level"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <table id="session_data" class="table table-bordered table-striped table-hover text-center"
+                               style="table-layout:auto">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        Sessions
+                                    </td>
+                                    <td>
+                                        # of Seats
+                                    </td>
+                                    <td>
+                                        Taken Seats
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="course.session_ids" t-as="session">
+                                    <tr>
+                                        <td>
+                                            <t t-esc="session.name"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="session.seats"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="session.taken_seats"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </t>
+    </template>
+
+    <template id="sessions" name="Sessions">
+        <t t-call="website.layout">
+            <t t-set="title"> Openacademy Sessions</t>
+            <div class="oe_structure">
+                <div class="container">
+                    <h2>Sessions list:</h2>
+                    <ul>
+                        <t t-foreach="sessions" t-as="session">
+                            <li>
+                                <a t-attf-href="/openacademy/sessions/{{session.id}}">
+                                    <b><t t-esc="session.name"/></b>
+                                </a>
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="session_page">
+        <t t-call="website.layout">
+            <t t-set="title">Session information</t>
+            <div class="oe_structure">
+                <div class="container">
+                    <h2>Session Information:</h2>
+                    <table id="session_data_1"
+                           class="table table-bordered table-striped table-hover text-center mb-0 pb-0 "
+                           style="table-layout:auto">
+                        <thead>
+                            <tr>
+                                <td>
+                                    Course
+                                </td>
+                                <td>
+                                    Level
+                                </td>
+                                <td>
+                                    Instructor
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <t t-esc="session.course_id.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="session.course_id.level"/>
+                                </td>
+                                <td>
+                                    <t t-esc="session.instruction_id.name"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table id="session_data_2"
+                           class="table table-bordered table-striped table-hover text-center mb-0 pb-0 "
+                           style="table-layout:auto">
+                        <thead>
+                            <tr>
+                                <td>
+                                    Start Date
+                                </td>
+                                <td>
+                                    End Date
+                                </td>
+                                <td>
+                                    Seats
+                                </td>
+                                <td>
+                                    Attendees Count
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <t t-esc="session.start_date"/>
+                                </td>
+                                <td>
+                                    <t t-esc="session.end_date"/>
+                                </td>
+                                <td>
+                                    <t t-esc="session.seats"/>
+                                </td>
+                                <td>
+                                    <t t-esc="session.attendees_count"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </t>
